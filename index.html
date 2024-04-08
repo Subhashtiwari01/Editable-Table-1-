@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Table Task</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-left: 20vw;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    input[type="text"] {
+      width: calc(100% - 20px);
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    .edit-btn {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    .save-btn {
+      padding: 8px 16px;
+      width: 20%;
+      height: 7vh;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      margin-right: 120px;
+    }
+    .edit-btn:hover{
+      background-color: #45a049;
+    }
+    .save-btn {
+      background-color: #008CBA;
+    }
+    .btn-container {
+      text-align: center; 
+      margin-top: 20px;
+    }
+    .edit-btn-container {
+      display: flex;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2 style="text-align: center;">Table</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Task Name</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+  <div class="btn-container">
+    <button class="save-btn" id="save-btn">Save</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+<script type="text/babel">
+  class EditableTable extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        tasks: [
+          { id: 1, name: 'onboardingCall', value: '', editing: true },
+          { id: 2, name: 'googleSearchConsoleAccess', value: '', editing: true },
+          { id: 3, name: 'googleAnalyticsAccess', value: '', editing: true },
+          { id: 4, name: 'websiteAccess', value: '', editing: true },
+          { id: 5, name: 'technicalAudit', value: '', editing: true },
+          { id: 6, name: 'anchorTextAndSemanticAnalysis', value: '', editing: true },
+          { id: 7, name: 'googleDataStudioReport', value: '', editing: true },
+          { id: 8, name: 'siteLevelOptimization', value: '', editing: true },
+          { id: 9, name: 'onPageOptimization', value: '', editing: true },
+          { id: 10, name: 'contentCreation', value: '', editing: true },
+          { id: 11, name: 'premiumPressRelease', value: '', editing: true },
+          { id: 12, name: 'authorityNichePlacement', value: '', editing: true },
+          { id: 13, name: 'reviewManagement', value: '', editing: true },
+          { id: 14, name: 'indexLinks', value: '', editing: true },
+          { id: 15, name: 'videoRecap', value: '', editing: true },
+        ]
+      };
+    }
+
+    handleTaskChange = (event, id) => {
+      const { value } = event.target;
+      this.setState(prevState => ({
+        tasks: prevState.tasks.map(task => (
+          task.id === id ? { ...task, value } : task
+        ))
+      }));
+    };
+
+    handleEditClick = (id) => {
+      this.setState(prevState => ({
+        tasks: prevState.tasks.map(task => (
+          task.id === id ? { ...task, editing: !task.editing } : task
+        ))
+      }));
+    };
+
+    saveDataToApi = () => {
+      console.log('Data to post:', this.state.tasks);
+      fetch('api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(this.state.tasks),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Response from API:', data);
+      })
+      .catch(error => {
+        console.error('Error posting data:', error);
+      });
+    };
+
+    renderTasks = () => {
+      return this.state.tasks.map(task => (
+        <tr key={task.id}>
+          <td>{task.name}</td>
+          <td>
+            {task.editing ?
+              <input type="text" value={task.value || ''} onChange={e => this.handleTaskChange(e, task.id)} required/> :
+              <span>{task.value}</span>
+            }
+          </td>
+          <td>
+            <div class="edit-btn-container">
+              <button className="edit-btn" onClick={() => this.handleEditClick(task.id)}>
+                {task.editing ? 'Done' : 'Edit'}
+              </button>
+            </div>
+          </td>
+        </tr>
+      ));
+    };
+
+    render() {
+      return (
+        <tbody>{this.renderTasks()}</tbody>
+      );
+    }
+  }
+
+  ReactDOM.render(<EditableTable />, document.getElementById('table-body'));
+  document.getElementById('save-btn').addEventListener('click', function() {
+    ReactDOM.render(<EditableTable />, document.getElementById('table-body'));
+    const editableTable = document.getElementById('root').innerHTML;
+    console.log(editableTable);
+  });
+</script>
+
+</body>
+</html>
