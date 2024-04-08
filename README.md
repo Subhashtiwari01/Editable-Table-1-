@@ -15,6 +15,3 @@ This repository contains a React application for managing tasks within a table f
 - **Save Changes**: Clicking the "Save" button will trigger a POST request to an API endpoint, saving the updated task values.
 - **Toggle Edit Mode**: Users can toggle between edit and view modes for each task by clicking the "Edit" or "Done" button respectively.
 
-## Setup Instructions
-
-1. **Clone the Repository**: Clone this repository to your local machine using the following command:
